@@ -1,0 +1,142 @@
+-- --------------------------------------------------------
+-- Servidor:                     127.0.0.1
+-- Versão do servidor:           10.4.11-MariaDB - mariadb.org binary distribution
+-- OS do Servidor:               Win64
+-- HeidiSQL Versão:              11.0.0.5919
+-- --------------------------------------------------------
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+
+-- Copiando estrutura do banco de dados para imobiliaria
+CREATE DATABASE IF NOT EXISTS `imobiliaria` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+USE `imobiliaria`;
+
+-- Copiando estrutura para tabela imobiliaria.contrato
+CREATE TABLE IF NOT EXISTS `contrato` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ID_PESSOA_CLIENTE` int(11) NOT NULL,
+  `ID_IMOVEL` int(11) NOT NULL,
+  `DT_INICIO` date NOT NULL,
+  `DT_FIM` date NOT NULL,
+  `TX_ADM` int(11) NOT NULL DEFAULT 0,
+  `VL_ALUGUEL` float(12,2) NOT NULL DEFAULT 0.00,
+  `VL_CONDOMINIO` float(12,2) NOT NULL DEFAULT 0.00,
+  `VL_IPTU` float(12,2) NOT NULL DEFAULT 0.00,
+  `VL_TX_ADM` float(12,2) NOT NULL DEFAULT 0.00,
+  `ATIVO` int(11) NOT NULL DEFAULT 1,
+  `DT_CADASTRO` datetime NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='PG=PAGO\r\nDT=DATA\r\nTX=TAXA\r\nVL=VALOR';
+
+-- Copiando dados para a tabela imobiliaria.contrato: ~1 rows (aproximadamente)
+/*!40000 ALTER TABLE `contrato` DISABLE KEYS */;
+INSERT INTO `contrato` (`ID`, `ID_PESSOA_CLIENTE`, `ID_IMOVEL`, `DT_INICIO`, `DT_FIM`, `TX_ADM`, `VL_ALUGUEL`, `VL_CONDOMINIO`, `VL_IPTU`, `VL_TX_ADM`, `ATIVO`, `DT_CADASTRO`) VALUES
+	(1, 31, 5, '2022-05-01', '2023-04-30', 5, 2200.00, 500.00, 100.00, 110.00, 1, '2022-06-29 02:24:55');
+/*!40000 ALTER TABLE `contrato` ENABLE KEYS */;
+
+-- Copiando estrutura para tabela imobiliaria.descricao
+CREATE TABLE IF NOT EXISTS `descricao` (
+  `ID` int(11) NOT NULL,
+  `REF` int(11) NOT NULL,
+  `DESC` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='DESCRICAO UTILIZADA EM ALGUNS SELECTS CONFORME REF = REFERENCIA INDICADA ABAIXO\r\nREF =1 ---> 0=NAO 1=SIM ---> USADO EM: MENSALIDADE.PHP';
+
+-- Copiando dados para a tabela imobiliaria.descricao: ~2 rows (aproximadamente)
+/*!40000 ALTER TABLE `descricao` DISABLE KEYS */;
+INSERT INTO `descricao` (`ID`, `REF`, `DESC`) VALUES
+	(0, 1, 'NÃO'),
+	(1, 1, 'SIM');
+/*!40000 ALTER TABLE `descricao` ENABLE KEYS */;
+
+-- Copiando estrutura para tabela imobiliaria.imovel
+CREATE TABLE IF NOT EXISTS `imovel` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ID_PROPRIETARIO` int(11) NOT NULL,
+  `ENDERECO` varchar(200) NOT NULL,
+  `ATIVO` int(11) NOT NULL DEFAULT 1,
+  `DT_CADASTRO` datetime NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_imovel_pessoa` (`ID_PROPRIETARIO`),
+  CONSTRAINT `FK_imovel_pessoa` FOREIGN KEY (`ID_PROPRIETARIO`) REFERENCES `pessoa` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COMMENT='DT=DATA\r\n';
+
+-- Copiando dados para a tabela imobiliaria.imovel: ~5 rows (aproximadamente)
+/*!40000 ALTER TABLE `imovel` DISABLE KEYS */;
+INSERT INTO `imovel` (`ID`, `ID_PROPRIETARIO`, `ENDERECO`, `ATIVO`, `DT_CADASTRO`) VALUES
+	(1, 42, 'RUA MANUEL 2010 - SP', 1, '2022-06-23 03:19:12'),
+	(2, 35, 'RUA DOS INGLESES 100 - SP', 1, '2022-06-23 03:19:34'),
+	(3, 37, 'RUA DO ORATÓRIO 1255 - SP', 1, '2022-06-23 03:20:04'),
+	(4, 40, 'RUA DA MOOCA 8000 - SP', 1, '2022-06-23 03:20:18'),
+	(5, 35, 'AV PAULISTA 1212', 0, '2022-06-25 16:32:43');
+/*!40000 ALTER TABLE `imovel` ENABLE KEYS */;
+
+-- Copiando estrutura para tabela imobiliaria.mensalidade
+CREATE TABLE IF NOT EXISTS `mensalidade` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ID_CONTRATO` int(11) NOT NULL,
+  `DT_REF` date DEFAULT NULL,
+  `VL_MENSALIDADE` float(10,2) DEFAULT NULL,
+  `PG_MENSALIDADE` int(11) DEFAULT 0 COMMENT '0=NAO PAGO, 1=PAGO',
+  `DT_PG_MENSALIDADE` date DEFAULT NULL,
+  `VL_REPASSE` float(10,2) DEFAULT NULL,
+  `PG_REPASSE` int(11) DEFAULT 0 COMMENT '0=NAO PAGO, 1=PAGO',
+  `DT_PG_REPASSE` date DEFAULT NULL,
+  `VL_CONDOMINIO` float(10,2) DEFAULT NULL,
+  `PG_CONDOMINIO` int(11) DEFAULT 0 COMMENT '0=NAO PAGO, 1=PAGO',
+  `DT_PG_CONDOMINIO` date DEFAULT NULL,
+  `ATIVO` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COMMENT='PG=PAGO\r\nDT=DATA\r\nREF=REFERENCIA\r\nVL=VALOR';
+
+-- Copiando dados para a tabela imobiliaria.mensalidade: ~12 rows (aproximadamente)
+/*!40000 ALTER TABLE `mensalidade` DISABLE KEYS */;
+INSERT INTO `mensalidade` (`ID`, `ID_CONTRATO`, `DT_REF`, `VL_MENSALIDADE`, `PG_MENSALIDADE`, `DT_PG_MENSALIDADE`, `VL_REPASSE`, `PG_REPASSE`, `DT_PG_REPASSE`, `VL_CONDOMINIO`, `PG_CONDOMINIO`, `DT_PG_CONDOMINIO`, `ATIVO`) VALUES
+	(1, 1, '2022-06-01', 2800.00, 0, '0000-00-00', 2190.00, 0, '0000-00-00', 500.00, 0, '0000-00-00', 1),
+	(2, 1, '2022-07-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(3, 1, '2022-08-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(4, 1, '2022-09-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(5, 1, '2022-10-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(6, 1, '2022-11-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(7, 1, '2022-12-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(8, 1, '2023-01-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(9, 1, '2023-02-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(10, 1, '2023-03-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(11, 1, '2023-04-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1),
+	(12, 1, '2023-05-01', 2800.00, 0, NULL, 2190.00, 0, NULL, 500.00, 0, NULL, 1);
+/*!40000 ALTER TABLE `mensalidade` ENABLE KEYS */;
+
+-- Copiando estrutura para tabela imobiliaria.pessoa
+CREATE TABLE IF NOT EXISTS `pessoa` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NOME` varchar(100) NOT NULL,
+  `EMAIL` varchar(150) NOT NULL,
+  `TELEFONE` varchar(15) NOT NULL,
+  `DIA_REPASSE` int(11) NOT NULL DEFAULT 1,
+  `LOCATARIO_PROPRIETARIO` int(11) NOT NULL DEFAULT 0 COMMENT '0=LACATARIO; 1=PROPRIETARIO',
+  `ATIVO` int(11) NOT NULL DEFAULT 1 COMMENT '0=INATIVO; 1=ATIVO',
+  `DT_CADASTRO` datetime NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COMMENT='DT=DATA';
+
+-- Copiando dados para a tabela imobiliaria.pessoa: ~9 rows (aproximadamente)
+/*!40000 ALTER TABLE `pessoa` DISABLE KEYS */;
+INSERT INTO `pessoa` (`ID`, `NOME`, `EMAIL`, `TELEFONE`, `DIA_REPASSE`, `LOCATARIO_PROPRIETARIO`, `ATIVO`, `DT_CADASTRO`) VALUES
+	(27, 'JOÃO ALVES', 'JOAO@JOAO', '11999998888', 1, 0, 1, '2022-06-23 03:00:25'),
+	(29, 'JOSE FERNANDES', 'JOSE@JOSE', '11999997777', 1, 0, 1, '2022-06-23 03:00:53'),
+	(31, 'ARTHUR MARIANO', 'ARTHUR@ARTHUR', '11999996666', 1, 0, 1, '2022-06-23 03:01:21'),
+	(33, 'FATIMA LUZ', 'FATIMA@FATIMA', '11999995555', 1, 0, 1, '2022-06-23 03:01:40'),
+	(35, 'ALINE CRUZ', 'ALINE@ALINE', '11999994444', 10, 1, 1, '2022-06-23 03:02:08'),
+	(37, 'JANAINA MUNIZ', 'JANAINA@JANAINA', '11999993333', 7, 1, 1, '2022-06-23 03:02:34'),
+	(40, 'JULIANO JUNIOR', 'JUNIOR@JUNIOR', '11888880000', 11, 1, 1, '2022-06-23 03:10:15'),
+	(42, 'ENZO', 'ENZO@ENZO', '11777770000', 12, 1, 1, '2022-06-23 03:18:28'),
+	(45, 'JOSEMAR', 'JOSEMAR@JOSEMAR', '11987878787', 1, 0, 1, '2022-06-26 16:17:52');
+/*!40000 ALTER TABLE `pessoa` ENABLE KEYS */;
+
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
